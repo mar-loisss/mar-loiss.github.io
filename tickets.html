@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theatre Guild - Tickets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tickets.css">
+    <style>
+        .header-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        :root {
+            --bg-color: #0a0a0f;
+            --seat-available: #444451;
+            --seat-selected: #d4af37;
+            --seat-occupied: #2a2a35;
+            --text: #ffffff;
+            --accent: #d4af37;
+            --accent-hover: #e8c96d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .booking-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .movie-selector {
+            margin: 2rem 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .movie-selector label {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            color: var(--accent);
+        }
+
+        .movie-selector select {
+            background-color: #1a1a24;
+            color: var(--text);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .theater {
+            perspective: 1000px;
+            margin: 2rem 0;
+        }
+
+        .screen {
+            background: linear-gradient(to right, #d4af37, #f1e5ac, #d4af37);
+            height: 70px;
+            width: 80%;
+            margin: 0 auto 3rem;
+            transform: rotateX(-45deg);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.5);
+            border-radius: 4px;
+        }
+
+        .seats-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+
+        .seat {
+            background-color: var(--seat-available);
+            height: 24px;
+            width: 28px;
+            margin: 0 4px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seat:not(.occupied):hover {
+            transform: scale(1.1);
+            background-color: var(--accent-hover);
+        }
+
+        .seat.selected {
+            background-color: var(--seat-selected);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+        }
+
+        .seat.occupied {
+            background-color: var(--seat-occupied);
+            cursor: not-allowed;
+        }
+
+        .seat-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .summary {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .summary p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .summary span {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .btn-book {
+            background-color: var(--accent);
+            color: #000;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-book:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .seat {
+                height: 18px;
+                width: 20px;
+                margin: 0 2px;
+            }
+            
+            .screen {
+                width: 90%;
+                margin-bottom: 2rem;
+            }
+            
+            .legend {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="home.html" class="logo">
+                <div class="logo-text">Theatre Guild</div>
+            </a>
+            <div class="nav-container">
+                <nav>
+                    <ul>
+                        <li><a href="home.html">Home</a></li>
+                        <li><a href="crew.html">Crew</a></li>
+                        <li><a href="abtus.html">About us</a></li>
+                        <li><a href="media.html">Gallery</a></li>
+                    </ul>
+                </nav>
+                <div class="nav-buttons">
+                    <div class="nav-button">
+                        <a href="tickets.html" class="btn btn-primary">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'); background-size: cover; background-position: center; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0; position: relative;">
+        <div class="container" style="width: 100%; max-width: 1200px; height: 100%;">
+            <div class="hero-content" style="width: 100%; max-width: 800px; margin: 0 auto; text-align: center; color: #fff; padding: 2rem; position: relative; z-index: 2;">
+                <h1 class="hero-title" style="text-align: center; width: 100%;">Book Your Seats</h1>
+                <p class="hero-text" style="font-size: 1.25rem; margin: 0 auto 2rem; opacity: 0.9; max-width: 600px; text-align: center; line-height: 1.6;">Secure the best seats for an unforgettable night of live theater. Experience the magic of student performances in our intimate venue.</p>
+                <div class="hero-buttons" style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="#seating" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1.1rem;">View Seating</a>
+                    <a href="#shows" class="btn btn-outline" style="padding: 0.8rem 2rem; font-size: 1.1rem; border: 2px solid #fff; color: #fff; background: transparent;">View Shows</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="booking-container" id="seating">
+            <h1>Select Your Seats</h1>
+            <p>Choose your preferred seats for an unforgettable theatrical experience</p>
+            
+            <div class="movie-selector">
+                <label for="movie">Select Show:</label>
+                <select id="movie">
+                    <option value="25">Coco - The Musical ($25)</option>
+                    <option value="20">Romeo & Juliet ($20)</option>
+                    <option value="18">A Midsummer Night's Dream ($18)</option>
+                    <option value="22">Les Misérables ($22)</option>
+                </select>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-available);"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-occupied);"></div>
+                    <span>Occupied</span>
+                </div>
+            </div>
+
+            <div class="theater">
+                <div class="screen"></div>
+                <div class="seats-container">
+                    <!-- Premium Rows - Front -->
+                    <div class="premium-section">
+                        <div class="row premium-row">
+                            <div class="seat premium" data-seat="P1"><span class="seat-label">P1</span></div>
+                            <div class="seat premium" data-seat="P2"><span class="seat-label">P2</span></div>
+                            <div class="seat premium occupied" data-seat="P3"><span class="seat-label">P3</span></div>
+                            <div class="seat premium" data-seat="P4"><span class="seat-label">P4</span></div>
+                            <div class="seat premium occupied" data-seat="P5"><span class="seat-label">P5</span></div>
+                            <div class="seat premium" data-seat="P6"><span class="seat-label">P6</span></div>
+                            <div class="seat premium" data-seat="P7"><span class="seat-label">P7</span></div>
+                            <div class="seat premium" data-seat="P8"><span class="seat-label">P8</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Regular Rows -->
+                    <div class="regular-section">
+                        <!-- Row A -->
+                        <div class="row">
+                            <div class="seat" data-seat="A1"><span class="seat-label">A1</span></div>
+                            <div class="seat" data-seat="A2"><span class="seat-label">A2</span></div>
+                            <div class="seat occupied" data-seat="A3"><span class="seat-label">A3</span></div>
+                            <div class="seat" data-seat="A4"><span class="seat-label">A4</span></div>
+                            <div class="seat" data-seat="A5"><span class="seat-label">A5</span></div>
+                            <div class="seat" data-seat="A6"><span class="seat-label">A6</span></div>
+                            <div class="seat" data-seat="A7"><span class="seat-label">A7</span></div>
+                            <div class="seat occupied" data-seat="A8"><span class="seat-label">A8</span></div>
+                            <div class="seat" data-seat="A9"><span class="seat-label">A9</span></div>
+                            <div class="seat" data-seat="A10"><span class="seat-label">A10</span></div>
+                        </div>
+
+                        <!-- Row B -->
+                        <div class="row">
+                            <div class="seat" data-seat="B1"><span class="seat-label">B1</span></div>
+                            <div class="seat" data-seat="B2"><span class="seat-label">B2</span></div>
+                            <div class="seat occupied" data-seat="B3"><span class="seat-label">B3</span></div>
+                            <div class="seat occupied" data-seat="B4"><span class="seat-label">B4</span></div>
+                            <div class="seat" data-seat="B5"><span class="seat-label">B5</span></div>
+                            <div class="seat" data-seat="B6"><span class="seat-label">B6</span></div>
+                            <div class="seat" data-seat="B7"><span class="seat-label">B7</span></div>
+                            <div class="seat" data-seat="B8"><span class="seat-label">B8</span></div>
+                            <div class="seat" data-seat="B9"><span class="seat-label">B9</span></div>
+                            <div class="seat" data-seat="B10"><span class="seat-label">B10</span></div>
+                        </div>
+
+                        <!-- Row C -->
+                        <div class="row">
+                            <div class="seat" data-seat="C1"><span class="seat-label">C1</span></div>
+                            <div class="seat" data-seat="C2"><span class="seat-label">C2</span></div>
+                            <div class="seat" data-seat="C3"><span class="seat-label">C3</span></div>
+                            <div class="seat" data-seat="C4"><span class="seat-label">C4</span></div>
+                            <div class="seat occupied" data-seat="C5"><span class="seat-label">C5</span></div>
+                            <div class="seat occupied" data-seat="C6"><span class="seat-label">C6</span></div>
+                            <div class="seat" data-seat="C7"><span class="seat-label">C7</span></div>
+                            <div class="seat" data-seat="C8"><span class="seat-label">C8</span></div>
+                            <div class="seat" data-seat="C9"><span class="seat-label">C9</span></div>
+                            <div class="seat" data-seat="C10"><span class="seat-label">C10</span></div>
+                        </div>
+
+                        <!-- Row D -->
+                        <div class="row">
+                            <div class="seat" data-seat="D1"><span class="seat-label">D1</span></div>
+                            <div class="seat" data-seat="D2"><span class="seat-label">D2</span></div>
+                            <div class="seat" data-seat="D3"><span class="seat-label">D3</span></div>
+                            <div class="seat" data-seat="D4"><span class="seat-label">D4</span></div>
+                            <div class="seat" data-seat="D5"><span class="seat-label">D5</span></div>
+                            <div class="seat" data-seat="D6"><span class="seat-label">D6</span></div>
+                            <div class="seat" data-seat="D7"><span class="seat-label">D7</span></div>
+                            <div class="seat" data-seat="D8"><span class="seat-label">D8</span></div>
+                            <div class="seat" data-seat="D9"><span class="seat-label">D9</span></div>
+                            <div class="seat" data-seat="D10"><span class="seat-label">D10</span></div>
+                        </div>
+
+                        <!-- Row E -->
+                        <div class="row">
+                            <div class="seat" data-seat="E1"><span class="seat-label">E1</span></div>
+                            <div class="seat" data-seat="E2"><span class="seat-label">E2</span></div>
+                            <div class="seat" data-seat="E3"><span class="seat-label">E3</span></div>
+                            <div class="seat" data-seat="E4"><span class="seat-label">E4</span></div>
+                            <div class="seat" data-seat="E5"><span class="seat-label">E5</span></div>
+                            <div class="seat" data-seat="E6"><span class="seat-label">E6</span></div>
+                            <div class="seat" data-seat="E7"><span class="seat-label">E7</span></div>
+                            <div class="seat" data-seat="E8"><span class="seat-label">E8</span></div>
+                            <div class="seat" data-seat="E9"><span class="seat-label">E9</span></div>
+                            <div class="seat" data-seat="E10"><span class="seat-label">E10</span></div>
+                        </div>
+
+                        <!-- Row F -->
+                        <div class="row">
+                            <div class="seat" data-seat="F1"><span class="seat-label">F1</span></div>
+                            <div class="seat" data-seat="F2"><span class="seat-label">F2</span></div>
+                            <div class="seat" data-seat="F3"><span class="seat-label">F3</span></div>
+                            <div class="seat" data-seat="F4"><span class="seat-label">F4</span></div>
+                            <div class="seat" data-seat="F5"><span class="seat-label">F5</span></div>
+                            <div class="seat" data-seat="F6"><span class="seat-label">F6</span></div>
+                            <div class="seat" data-seat="F7"><span class="seat-label">F7</span></div>
+                            <div class="seat" data-seat="F8"><span class="seat-label">F8</span></div>
+                            <div class="seat" data-seat="F9"><span class="seat-label">F9</span></div>
+                            <div class="seat" data-seat="F10"><span class="seat-label">F10</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary">
+                <p>You have selected <span id="count">0</span> seats</p>
+                <p>Total Price: $<span id="total">0</span></p>
+                <button class="btn-book" id="book-now">Book Now</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h3>Theatre Guild</h3>
+          <p>A passionate community of artists dedicated to creating unforgettable performances and nurturing young talents.</p>
+          <div class="social-links">
+            <a href="https://www.facebook.com/btthstheatreguild" title="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="crew.html">Crew</a></li>
+            <li><a href="media.html">Media</a></li>
+            <li><a href="tickets.html">Tickets</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Contact Info</h3>
+          <p><strong>Email:</strong> info@theatreguild.com</p>
+          <p><strong>Phone:</strong> (555) 123-4567</p>
+          <p><strong>Address:</strong> 123 Theatre Lane, Arts District</p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Newsletter</h3>
+          <p>Subscribe for updates on shows and events</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Your email" required>
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 Theatre Guild. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.seats-container');
+        const seats = document.querySelectorAll('.seat:not(.occupied)');
+        const count = document.getElementById('count');
+        const total = document.getElementById('total');
+        const movieSelect = document.getElementById('movie');
+        const bookButton = document.getElementById('book-now');
+        
+        let ticketPrice = +movieSelect.value;
+        let selectedSeats = [];
+
+        // Update total and count
+        function updateSelectedCount() {
+            const selectedSeats = document.querySelectorAll('.row .seat.selected');
+            const selectedSeatsCount = selectedSeats.length;
+            
+            // Update UI
+            count.innerText = selectedSeatsCount;
+            total.innerText = selectedSeatsCount * ticketPrice;
+            
+            // Update button state
+            bookButton.disabled = selectedSeatsCount === 0;
+            
+            // Store selected seats data
+            const seatsIndex = [...selectedSeats].map(seat => seat.getAttribute('data-seat'));
+            localStorage.setItem('selectedSeats', JSON.stringify(seatsIndex));
+        }
+
+        // Movie select event
+        movieSelect.addEventListener('change', e => {
+            ticketPrice = +e.target.value;
+            updateSelectedCount();
+        });
+
+        // Seat click event
+        container.addEventListener('click', e => {
+            const seat = e.target.closest('.seat');
+            if (seat && !seat.classList.contains('occupied')) {
+                seat.classList.toggle('selected');
+                updateSelectedCount();
+            }
+        });
+
+        // Book now button click
+        bookButton.addEventListener('click', () => {
+            const selectedCount = document.querySelectorAll('.seat.selected').length;
+            if (selectedCount > 0) {
+                alert(`Successfully booked ${selectedCount} seat(s) for $${ticketPrice * selectedCount}. Thank you!`);
+                // Reset selection
+                document.querySelectorAll('.seat.selected').forEach(seat => {
+                    seat.classList.remove('selected');
+                    seat.classList.add('occupied');
+                });
+                updateSelectedCount();
+            }
+        });
+
+        // Load previously selected seats from localStorage
+        const selectedSeatsFromStorage = JSON.parse(localStorage.getItem('selectedSeats')) || [];
+        selectedSeatsFromStorage.forEach(seatId => {
+            const seat = document.querySelector(`[data-seat="${seatId}"]`);
+            if (seat) {
+                seat.classList.add('selected');
+            }
+        });
+
+        // Initial count update
+        updateSelectedCount();
+    });
+  </script>
+  <!-- Custom Cursor Elements -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    
+    <script>
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // Add slight delay to the follower for a trailing effect
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+        
+        // Add hover effect on interactive elements
+        const interactiveElements = ['a', 'button', 'input', 'textarea', 'select', '.btn', '.seat:not(.occupied)'];
+        interactiveElements.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    cursor.classList.add('hover');
+                });
+                element.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('hover');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
